@@ -16,6 +16,7 @@ class StatTracker
     new(games, teams, game_teams)
   end
 
+  # Game Statistics
   def total_goals_per_game
     @games.map do |row|
       away_goals = row[:away_goals].to_i
@@ -79,5 +80,35 @@ class StatTracker
       end
       seasons_hash[season] = (total_goals_per_season.to_f / season_games.count).round(2)
     end
+  end
+
+  # League Statistics
+  def count_of_teams
+    @teams.count
+  end
+
+  def best_offense
+    best_team_id = average_goals_per_game_by_team.max_by { |_, avg_goals| avg_goals }.first
+    find_team_name_by_id(best_team_id)
+  end
+
+  def worst_offense
+    worst_team_id = average_goals_per_game_by_team.min_by { |_, avg_goals| avg_goals }.first
+    find_team_name_by_id(worst_team_id)
+  end
+
+  def grouped_teams
+    @game_teams.group_by { |game_team| game_team[:team_id] }
+  end
+
+  def average_goals_per_game_by_team
+    grouped_teams.transform_values do |games|
+      total_goals = games.sum { |game| game[:goals].to_f }
+      total_goals / games.size
+    end
+  end
+
+  def find_team_name_by_id(team_id)
+    @teams.find { |team| team[:team_id] == team_id }[:teamname]
   end
 end

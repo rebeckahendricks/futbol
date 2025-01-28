@@ -23,12 +23,23 @@ RSpec.describe StatTracker do
 
     CSV.open(@teams_file.path, 'wb') do |csv|
       csv << %w[team_id franchiseId teamName abbreviation Stadium link]
-      csv << []
+      csv << [1, 23, 'Atlanta United', 'ATL', 'Mercedes-Benz Stadium', '/api/v1/teams/1']
+      csv << [4, 16, 'Chicago Fire', 'CHI', 'SeatGeek Stadium', '/api/v1/teams/4']
+      csv << [26, 14, 'FC Cincinnati', 'CIN', 'Nippert Stadium', '/api/v1/teams/26']
+      csv << [14, 31, 'DC United', 'DC', 'Audi Field', '/api/v1/teams/14']
     end
 
     CSV.open(@game_teams_file.path, 'wb') do |csv|
       csv << %w[game_id team_id HoA result settled_in head_coach goals shots tackles pim powerPlayOpportunities powerPlayGoals faceOffWinPercentage giveaways takeaways]
-      csv << []
+      csv << [2017030111, 1, 'away', 'LOSS', 'REG', 'John Hynes', 2, 7, 36, 2, 2, 1, 47.9, 6, 4]
+      csv << [2017030112, 1, 'away', 'TIE', 'REG', 'John Hynes', 3, 11, 36, 10, 3, 0, 34.4, 5, 4]
+      csv << [2017030113, 1, 'home', 'WIN', 'REG', 'John Hynes', 3, 10, 33, 64, 7, 1, 55.0, 10, 10]
+      csv << [2017030114, 1, 'home', 'LOSS', 'REG', 'John Hynes', 1, 7, 25, 12, 6, 1, 59.1, 11, 12]
+      csv << [2012020355, 4, 'away', 'LOSS', 'REG', 'Peter Laviolette', 0, 5, 41, 9, 3, 0, 51.7, 10, 2]
+      csv << [2012020483, 4, 'home', 'LOSS', 'REG', 'Peter Laviolette', 2, 8, 27, 6, 1, 1, 37.9, 13, 5]
+      csv << [2013020314, 4, 'home', 'WIN', 'REG', 'Craig Berube', 3, 10, 21, 19, 4, 1, 50.8, 8, 6]
+      csv << [2013020023, 4, 'away', 'LOSS', 'REG', 'Peter Laviolette', 1, 5, 29, 32, 5, 1, 51.3, 13, 4]
+      csv << [2012020112, 4, 'home', 'TIE', 'REG', 'Peter Laviolette', 3, 6, 25, 19, 3, 3, 45.5, 12, 11]
     end
 
     locations = {
@@ -94,6 +105,20 @@ RSpec.describe StatTracker do
       expected_hash = { "20122013" => 5, "20132014" => 8, "20172018" => 6, "20182019" => 1 }
 
       expect(@stat_tracker.average_goals_by_season).to eq(expected_hash)
+    end
+  end
+
+  describe 'League Statisitcs' do
+    it 'can calculate the count of teams' do
+      expect(@stat_tracker.count_of_teams).to eq(4)
+    end
+
+    it 'can determine the best offense' do
+      expect(@stat_tracker.best_offense).to eq('Atlanta United')
+    end
+
+    it 'can determine the worst offense' do
+      expect(@stat_tracker.worst_offense).to eq('Chicago Fire')
     end
   end
 end
